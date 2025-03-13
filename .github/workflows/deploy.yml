@@ -1,0 +1,28 @@
+name: CI/CD Monorepo - Sol-Walk
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy-frontend:
+    if: github.event.head_commit.message != 'skip frontend'
+    name: Trigger Vercel Frontend Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Frontend to Vercel
+        run: |
+          curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
+  deploy-backend:
+    if: github.event.head_commit.message != 'skip backend'
+    name: Trigger Render Backend Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Backend to Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
