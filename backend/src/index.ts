@@ -28,6 +28,11 @@ app.use('/api/challenges', challengeRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+// 🔥 Health Check Route for Render
+app.get('/healthz', (_req: Request, res: Response) => {
+  res.status(200).send('OK');
+});
+
 // Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
