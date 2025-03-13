@@ -58,5 +58,3 @@ This platform enables:
 | Groups                             | Join public or private challenge groups                     |
 
 ---
-
-## 🏗 Project Structure
