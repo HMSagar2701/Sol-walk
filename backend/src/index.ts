@@ -14,6 +14,9 @@ app.use(express.json());
 // DB connection
 connectDB();
 
+// Debug log for route import
+console.log('✅ Challenge routes loaded:', typeof challengeRoutes);
+
 // Health check route
 app.get('/', (_req: Request, res: Response) => {
   res.send('API is working!');
@@ -22,17 +25,21 @@ app.get('/', (_req: Request, res: Response) => {
 // ✅ Route Mounting
 app.use('/api/challenges', challengeRoutes);
 
-// Error handling
-app.use(notFound);
-app.use(errorHandler);
-
 // 🔥 Health Check Route for Render
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).send('OK');
 });
 
+// Error handling
+app.use(notFound);
+app.use(errorHandler);
+
+app.get('/api/challenge', (_req: Request, res: Response) => {
+  res.json([{ title: 'Walk 5000 steps', participants: 20 }]);
+});
+
 // Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
