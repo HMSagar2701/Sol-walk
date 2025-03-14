@@ -6,25 +6,23 @@ import { notFound, errorHandler } from './middlewares/errorHandler';
 import challengeRoutes from './routes/challenge.route';
 
 dotenv.config();
-
 const app = express();
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Connect to DB
+// DB connection
 connectDB();
 
-// Root Route
+// Health check route
 app.get('/', (_req: Request, res: Response) => {
   res.send('API is working!');
 });
 
-// Mount API Routes
+// ✅ Route Mounting
 app.use('/api/challenges', challengeRoutes);
 
-// Error handling middleware
+// Error handling
 app.use(notFound);
 app.use(errorHandler);
 

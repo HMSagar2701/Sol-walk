@@ -3,7 +3,7 @@ import { createChallenge, getChallenges } from '../controllers/challenge.control
 
 const router = Router();
 
-router.post('/', createChallenge);
 router.get('/', getChallenges);
+router.post('/', createChallenge);
 
 export default router;
