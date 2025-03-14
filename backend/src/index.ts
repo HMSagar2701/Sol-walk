@@ -34,10 +34,6 @@ app.get('/healthz', (_req: Request, res: Response) => {
 app.use(notFound);
 app.use(errorHandler);
 
-app.get('/api/challenge', (_req: Request, res: Response) => {
-  res.json([{ title: 'Walk 5000 steps', participants: 20 }]);
-});
-
 // Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
