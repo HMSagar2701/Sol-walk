@@ -7,7 +7,7 @@ import { notFound, errorHandler } from './middlewares/errorHandler';
 import jwt from 'jsonwebtoken';
 import groupRoutes from './routes/groupRoutes';
 import challengeRoute from './routes/groupChallengeRoutes';
-
+import { challengeTimelineJob } from './jobs/challengeTimeline.job';
 
 dotenv.config();
 const app = express();
@@ -72,6 +72,9 @@ app.get(
     });
   }
 );
+
+// Start challenge lifecycle cron job
+challengeTimelineJob.start();
 
 // ✅ Logout route (optional, frontend can just discard JWT)
 app.get('/logout', (_req: Request, res: Response) => {
