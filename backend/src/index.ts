@@ -1,11 +1,13 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import session from 'express-session';
 import passport from './config/passport';
 import connectDB from './config/db';
 import { notFound, errorHandler } from './middlewares/errorHandler';
 import challengeRoutes from './routes/challenge.route';
+import jwt from 'jsonwebtoken';
+import groupRoutes from './routes/groupRoutes';
+
 
 dotenv.config();
 const app = express();
@@ -13,28 +15,12 @@ const app = express();
 // ✅ Connect to MongoDB
 connectDB();
 
-// ✅ CORS Middleware
+// ✅ Middlewares
 app.use(cors());
-
-// ✅ JSON Parsing Middleware
 app.use(express.json());
-
-// ✅ Session Middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'your_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-    },
-  })
-);
 
 // ✅ Initialize Passport
 app.use(passport.initialize());
-app.use(passport.session());
 
 // ✅ Health Check Route
 app.get('/', (_req: Request, res: Response) => {
@@ -44,14 +30,16 @@ app.get('/', (_req: Request, res: Response) => {
 // ✅ Challenge Routes
 app.use('/api/challenges', challengeRoutes);
 
+// ✅ Group Routes
+app.use('/api/group', groupRoutes);
+
 // ✅ Render Health Check Route
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).send('OK');
 });
 
-
 // ===============================================
-// ✅ Google OAuth Routes
+// ✅ Google OAuth Routes with JWT
 // ===============================================
 
 // Start Google OAuth flow
@@ -59,40 +47,45 @@ app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// OAuth callback URL
+// OAuth callback - Generate JWT here
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  (_req: Request, res: Response) => {
-    res.redirect('/profile');
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  (req: Request, res: Response) => {
+    const user = req.user as any;
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '1d' }
+    );
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+      },
+    });
   }
 );
 
-// Logout route
-app.get('/logout', (req: Request, res: Response, next: NextFunction) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    res.redirect('/');
-  });
+// ✅ Logout route (optional, frontend can just discard JWT)
+app.get('/logout', (_req: Request, res: Response) => {
+  res.status(200).json({ message: 'Logged out successfully' });
 });
 
-// Protected route example
-const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/login');
-};
-
-app.get('/profile', ensureAuthenticated, (req: Request, res: Response) => {
-  const user = req.user as { name?: string };
-  res.send(`Welcome ${user?.name || 'User'}!`);
+// ✅ Example protected route
+import { authenticate } from './middlewares/auth.middleware'
+app.get('/profile', authenticate, (req: Request, res: Response) => {
+  const userId = (req as any).userId;
+  res.status(200).json({ message: `Authenticated User ID: ${userId}` });
 });
 
-// ===============================================
-
-
-// ✅ Error Handling Middlewares
+// ✅ Error Handling
 app.use(notFound);
 app.use(errorHandler);
 

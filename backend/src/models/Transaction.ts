@@ -1,17 +1,25 @@
-import { Schema, model, Document, Types } from "mongoose";
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ITransaction extends Document {
-  userId: Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  challengeId: mongoose.Types.ObjectId;
+  txHash: string;
   amount: number;
-  type: "stake" | "reward" | "forfeit";
-  status: "pending" | "completed" | "failed";
+  currency: 'USDT' | 'SOL';
+  createdAt: Date;
 }
 
-const transactionSchema = new Schema<ITransaction>({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  amount: { type: Number, required: true },
-  type: { type: String, enum: ["stake", "reward", "forfeit"], required: true },
-  status: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
-}, { timestamps: true });
+const TransactionSchema = new Schema<ITransaction>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    challengeId: { type: Schema.Types.ObjectId, ref: 'GroupChallenge', required: true },
+    txHash: { type: String, required: true },
+    amount: { type: Number, required: true },
+    currency: { type: String, enum: ['USDT', 'SOL'], required: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } }
+);
 
-export default model<ITransaction>("Transaction", transactionSchema);
+const Transaction = mongoose.model<ITransaction>('Transaction', TransactionSchema);
+
+export default Transaction;
