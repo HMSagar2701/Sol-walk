@@ -1,9 +1,9 @@
 import cron from 'node-cron';
 import { GroupChallenge } from '../models/GroupChallenge';
 
-export const challengeTimelineJob = cron.schedule('0 0 * * *', async () => {
-  // Runs every minute temporarily for testing
-  console.log('⏰ Running challenge timeline cron job...');
+export const challengeTimelineJob = cron.schedule('* * * * *', async () => {
+  // Runs daily at 00:00 midnight
+  console.log('⏰ Running daily challenge timeline cron job...');
 
   const today = new Date();
 
@@ -48,17 +48,20 @@ async function rewardHandlerForCompletedChallenges() {
   for (const challenge of challenges) {
     console.log(`🎁 Processing rewards for Challenge ID: ${challenge._id}`);
 
-    // TODO: You can implement your logic here.
-    // Example (pseudo logic):
+    // TODO: Add your health API polling + winner calculation here
+    // Example Pseudo-Logic:
     /*
-      - Fetch participants
-      - Check their progress
-      - Distribute rewards (simulate Solana USDT payout)
-      - Update challenge with winner status
+      1. Fetch all participants
+      2. Poll health API data (e.g., steps walked)
+      3. Verify if they achieved daily goals
+      4. Calculate winners or successful participants
+      5. Trigger Solana USDT reward payout
     */
 
-    // Example of marking challenge as 'REWARDS_DISTRIBUTED'
+    // Example placeholder:
     // challenge.rewardStatus = 'DISTRIBUTED';
     // await challenge.save();
   }
 }
+
+console.log('✅ Daily challenge timeline cron job scheduled at 00:00');

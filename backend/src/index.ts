@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken';
 import groupRoutes from './routes/groupRoutes';
 import challengeRoute from './routes/groupChallengeRoutes';
 import { challengeTimelineJob } from './jobs/challengeTimeline.job';
+import healthRoutes from './routes/health';
+import googleFitRoutes from './routes/googleFit';
 
 dotenv.config();
 const app = express();
@@ -37,6 +39,10 @@ app.use('/api/group', groupRoutes);
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).send('OK');
 });
+
+app.use('/api/health', healthRoutes);
+
+app.use('/api/googlefit', googleFitRoutes);
 
 // ===============================================
 // ✅ Google OAuth Routes with JWT
