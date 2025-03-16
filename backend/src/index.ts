@@ -4,9 +4,9 @@ import cors from 'cors';
 import passport from './config/passport';
 import connectDB from './config/db';
 import { notFound, errorHandler } from './middlewares/errorHandler';
-import challengeRoutes from './routes/challenge.route';
 import jwt from 'jsonwebtoken';
 import groupRoutes from './routes/groupRoutes';
+import challengeRoute from './routes/groupChallengeRoutes';
 
 
 dotenv.config();
@@ -28,7 +28,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 // ✅ Challenge Routes
-app.use('/api/challenges', challengeRoutes);
+app.use('/api/group-challenges', challengeRoute);
 
 // ✅ Group Routes
 app.use('/api/group', groupRoutes);
