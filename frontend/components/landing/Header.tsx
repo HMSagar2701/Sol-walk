@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Footprints } from "lucide-react";
+// import { ModeToggle } from "../mode-toggle";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,7 +20,9 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-gray-900/80 backdrop-blur-md py-3 shadow-lg" : "bg-transparent py-5"
+        scrolled
+          ? "bg-gray-900/80 backdrop-blur-md py-3 shadow-lg"
+          : "bg-transparent py-5"
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
@@ -35,21 +38,33 @@ export default function Header() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+          <Link
+            href="#features"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
             Features
           </Link>
-          <Link href="#how-it-works" className="text-gray-300 hover:text-white transition-colors">
+          <Link
+            href="#how-it-works"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
             How It Works
           </Link>
-          <Link href="#testimonials" className="text-gray-300 hover:text-white transition-colors">
+          <Link
+            href="#testimonials"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
             Testimonials
           </Link>
         </nav>
 
         {/* CTA Button */}
-        <button className="px-5 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-shadow">
-          Connect Wallet
-        </button>
+        <div className="hidden md:flex items-center gap-8">
+          <button className="px-5 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-shadow">
+            Connect Wallet
+          </button>
+          {/* <ModeToggle /> */}
+        </div>
       </div>
     </header>
   );

@@ -1,17 +1,18 @@
-import HeroSection from "./components/Hero"
-import Header from "./components/Header"
-import HowItWorksSection from "./components/HowItWorksSection"
-import TestimonialsSection from "./components/Testimonials"
-import Footer from "./components/Footer"
+import HeroSection from "../components/landing/Hero";
+import Header from "../components/landing/Header";
+import HowItWorksSection from "../components/landing/how-it-works";
+import TestimonialsSection from "../components/landing/Testimonials";
+import Footer from "../components/landing/Footer";
+import LandingWrapper from "../components/landing/LandingWrapper";
 
 export default function SolWalkLanding() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black text-white font-sans">      
-      < Header />
-      < HeroSection />
-      < HowItWorksSection />
-      < TestimonialsSection />
-      < Footer />
-    </div>
-  )
+    <LandingWrapper>
+      <Header />
+      <HeroSection />
+      <HowItWorksSection />
+      <TestimonialsSection />
+      <Footer />
+    </LandingWrapper>
+  );
 }

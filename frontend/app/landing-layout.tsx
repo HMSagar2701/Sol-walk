@@ -1,7 +1,7 @@
+// app/landing-layout.tsx
 import type React from "react";
 import "./globals.css";
 import type { Metadata } from "next";
-import { ThemeProvider } from "../components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Sol-Walk | Accountability-as-a-Service on Solana",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Put money on your goals. Win or lose, stay accountable with Sol-Walk, the Web3 fitness accountability platform built on Solana.",
 };
 
-export default function RootLayout({
+export default function LandingLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -24,15 +24,8 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+      <body className="landing-page">
+        {children}
       </body>
     </html>
   );
