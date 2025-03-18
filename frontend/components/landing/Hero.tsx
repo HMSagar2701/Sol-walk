@@ -3,6 +3,7 @@
 import { ArrowDown } from "lucide-react";
 import { Orbitron } from "next/font/google";
 import Link from "next/link";
+import { Button } from "../ui/button";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -39,13 +40,13 @@ export default function HeroSection() {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* Sign in with Google Button */}
-            <Link href="https://sol-walk.onrender.com/auth/google" className="w-full sm:w-auto">
-                <button
+            <Link href="http://localhost:8080/auth/google" className="w-full sm:w-auto">
+                <Button
                   className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] transition-all duration-300 text-base sm:text-lg tracking-wide"
                   style={{ fontFamily: "var(--font-orbitron)" }}
                 >
                   🚀 Sign in with Google
-                </button>
+                </Button>
             </Link>
 
             {/* Optional CTA Button */}

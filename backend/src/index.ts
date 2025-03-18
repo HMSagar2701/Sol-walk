@@ -19,7 +19,10 @@ const app = express();
 connectDB();
 
 // ✅ Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+}));
 app.use(express.json());
 
 // ✅ Initialize Passport
@@ -92,6 +95,7 @@ app.get('/logout', (_req: Request, res: Response) => {
 
 // ✅ Example protected route
 import { authenticate } from './middlewares/auth.middleware'
+import { CLIENT_URL } from './config/googleFit';
 app.get('/profile', authenticate, (req: Request, res: Response) => {
   const userId = (req as any).userId;
   res.status(200).json({ message: `Authenticated User ID: ${userId}` });

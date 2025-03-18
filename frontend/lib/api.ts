@@ -1,9 +1,20 @@
-import axios from "axios";
+import { API } from "./axios";
 
-const options = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
+export const getGroupChallengesRequest = async () => {
+  console.log("API", API);
+  const response = await API.get("/api/group/");
+  console.log("response", response);
+  // const response = await API.get("/api/group-challenges/")
 };
 
-export const API = axios.create(options);
+export const createGroupChallengesRequest = async () => {
+  // const response = await API.post("/api/group-challenges/create-group-challenge", {})
+};
 
+export const createGroupReuest = async () => {
+  // const response = await API.post("/api/group-challenges/create-group-challenge", {})
+};
+
+export const joinGroupChallengeRequest = async () =>{
+
+}
