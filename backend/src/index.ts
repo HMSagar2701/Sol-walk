@@ -11,6 +11,8 @@ import { challengeTimelineJob } from './jobs/challengeTimeline.job';
 import healthRoutes from './routes/health';
 import googleFitRoutes from './routes/googleFit';
 import fitbitRoutes from './routes/fitbitRoutes';
+import stakeRoutes from './routes/stakeRoutes';
+import solanaRoutes from "./routes/solanaRoutes";
 
 dotenv.config();
 const app = express();
@@ -46,6 +48,10 @@ app.use('/api/health', healthRoutes);
 app.use('/api/googlefit', googleFitRoutes);
 
 app.use('/api/fitbit', fitbitRoutes);
+
+app.use('/api/stake', stakeRoutes);
+
+app.use("/api/solana", solanaRoutes);
 
 // ===============================================
 // ✅ Google OAuth Routes with JWT
