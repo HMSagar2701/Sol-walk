@@ -76,7 +76,7 @@ app.get(
     );
 
     // 👇 Redirect to frontend with token & user info in query
-    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`;
+    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard`;
     res.redirect(redirectUrl);
   }
 );
