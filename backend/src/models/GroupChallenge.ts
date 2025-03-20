@@ -11,6 +11,7 @@ export interface IParticipant {
 }
 
 export interface IGroupChallenge extends Document {
+  potAmount?: number; // Optional, because some entries don’t have it
   groupId: mongoose.Types.ObjectId;
   challengeGoal: string;
   bidAmount: number;
@@ -34,6 +35,7 @@ const ParticipantSchema = new Schema<IParticipant>(
 
 const GroupChallengeSchema = new Schema<IGroupChallenge>(
   {
+    potAmount: { type: Number, default: 0 }, // ✅ Now properly defined in schema, optional, defaults to 0
     groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
     challengeGoal: { type: String, required: true },
     bidAmount: { type: Number, required: true },

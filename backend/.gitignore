@@ -41,3 +41,7 @@ jest.config.js
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# .gitignore
+dev-wallet.json
+src/dev-wallet.json

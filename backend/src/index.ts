@@ -11,6 +11,8 @@ import { challengeTimelineJob } from './jobs/challengeTimeline.job';
 import healthRoutes from './routes/health';
 import googleFitRoutes from './routes/googleFit';
 import fitbitRoutes from './routes/fitbitRoutes';
+import stakeRoutes from './routes/stakeRoutes';
+import solanaRoutes from "./routes/solanaRoutes";
 
 dotenv.config();
 const app = express();
@@ -50,6 +52,10 @@ app.use('/api/googlefit', googleFitRoutes);
 
 app.use('/api/fitbit', fitbitRoutes);
 
+app.use('/api/stake', stakeRoutes);
+
+app.use("/api/solana", solanaRoutes);
+
 // ===============================================
 // ✅ Google OAuth Routes with JWT
 // ===============================================
@@ -72,16 +78,9 @@ app.get(
       { expiresIn: '1d' }
     );
 
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        picture: user.picture,
-      },
-    });
+    // 👇 Redirect to frontend with token & user info in query
+    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard`;
+    res.redirect(redirectUrl);
   }
 );
 
