@@ -75,16 +75,9 @@ app.get(
       { expiresIn: '1d' }
     );
 
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        picture: user.picture,
-      },
-    });
+    // 👇 Redirect to frontend with token & user info in query
+    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`;
+    res.redirect(redirectUrl);
   }
 );
 
