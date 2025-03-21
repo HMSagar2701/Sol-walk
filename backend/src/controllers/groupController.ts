@@ -1,7 +1,7 @@
-import { Response } from 'express';
+import { Request,NextFunction, Response } from 'express';
 import { Group } from '../models/Group';
 import { AuthRequest } from '../middlewares/auth.middleware';
-
+import mongoose from 'mongoose';
 // POST /create-group
 export const createGroup = async (req: AuthRequest, res: Response): Promise<void> => {
   const { groupName } = req.body;
@@ -26,11 +26,14 @@ export const createGroup = async (req: AuthRequest, res: Response): Promise<void
 };
 
 // POST /invite-member
-export const inviteMember = async (req: AuthRequest, res: Response): Promise<void> => {
-  const { groupId, userId: invitedUserId } = req.body;
-  const inviterId = req.userId;
+// src/controllers/groupController.ts (append this to existing file)
 
-  if (!groupId || !invitedUserId || !inviterId) {
+
+export const acceptGroupInvite = async (req: AuthRequest, res: Response): Promise<void> => {
+  const { groupId } = req.params;
+  const userId = req.userId;
+
+  if (!groupId || !userId) {
     res.status(400).json({ message: 'Missing required fields' });
     return;
   }
@@ -42,21 +45,42 @@ export const inviteMember = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    if (!group.members.includes(inviterId as any)) {
-      res.status(403).json({ message: 'Only group members can invite others' });
-      return;
+    const userObjectId = new mongoose.Types.ObjectId(userId); // ✅ convert string to ObjectId
+
+    const alreadyMember = group.members.some(
+      (memberId) => memberId.toString() === userId
+    );
+
+    if (!alreadyMember) {
+      group.members.push(userObjectId);
+      await group.save();
     }
 
-    if (group.members.includes(invitedUserId)) {
-      res.status(400).json({ message: 'User already in the group' });
-      return;
-    }
-
-    group.members.push(invitedUserId);
-    await group.save();
-
-    res.status(200).json({ message: 'User added to group' });
+    res.status(200).json({
+      message: alreadyMember
+        ? 'Already a group member'
+        : 'Joined the group successfully',
+      group,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error inviting member', error });
+    res.status(500).json({ message: 'Error processing invite', error });
+  }
+};
+
+
+
+export const getGroupById = async (req: Request, res: Response): Promise<void> => {
+  const { groupId } = req.params;
+
+  try {
+    const group = await Group.findById(groupId);
+    if (!group) {
+      res.status(404).json({ message: 'Group not found' });
+      return;
+    }
+
+    res.status(200).json(group);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching group', error });
   }
 };

@@ -75,11 +75,11 @@ app.get(
       { expiresIn: '1d' }
     );
 
-    // 👇 Redirect to frontend with token & user info in query
-    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard`;
+    const redirectUrl = `${process.env.FRONTEND_URL}/dashboard?token=${token}&userId=${user._id}`;
     res.redirect(redirectUrl);
   }
 );
+
 
 // Start challenge lifecycle cron job
 challengeTimelineJob.start();

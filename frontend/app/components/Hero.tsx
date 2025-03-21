@@ -39,7 +39,8 @@ export default function HeroSection() {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* Sign in with Google Button */}
-            <Link href="https://sol-walk.onrender.com/auth/google" className="w-full sm:w-auto">
+            
+            <Link href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`} className="w-full sm:w-auto">
                 <button
                   className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] transition-all duration-300 text-base sm:text-lg tracking-wide"
                   style={{ fontFamily: "var(--font-orbitron)" }}

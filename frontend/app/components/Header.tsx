@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Footprints } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Dynamically import WalletMultiButton only on client side
+const WalletMultiButton = dynamic(
+  () => import("@solana/wallet-adapter-react-ui").then((mod) => mod.WalletMultiButton),
+  { ssr: false }
+);
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -11,7 +18,6 @@ export default function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -46,10 +52,10 @@ export default function Header() {
           </Link>
         </nav>
 
-        {/* CTA Button */}
-        <button className="px-5 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-shadow">
-          Connect Wallet
-        </button>
+        {/* Wallet Connect Button */}
+        <div className="hidden md:block">
+          <WalletMultiButton className="!bg-gradient-to-r from-purple-500 to-blue-500 !text-white !font-semibold hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-shadow" />
+        </div>
       </div>
     </header>
   );
