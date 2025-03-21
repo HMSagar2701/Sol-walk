@@ -23,7 +23,13 @@ app.set('trust proxy', 1); // Trust the first proxy (Render, Vercel, etc.)
 connectDB();
 
 // ✅ Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, 
+    credentials: true, // ✅ Allow cookies & headers
+  })
+);
+
 app.use(express.json());
 
 // ✅ Initialize Passport
