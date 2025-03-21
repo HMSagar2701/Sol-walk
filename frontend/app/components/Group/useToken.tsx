@@ -1,4 +1,3 @@
-// components/useToken.ts
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,7 +22,7 @@ export const useToken = () => {
     }
 
     setLoading(false);
-  }, []);
+  }, [searchParams]); // <== added this
 
   return { token, loading };
 };
