@@ -17,6 +17,8 @@ import solanaRoutes from "./routes/solanaRoutes";
 dotenv.config();
 const app = express();
 
+app.set('trust proxy', 1); // Trust the first proxy (Render, Vercel, etc.)
+
 // ✅ Connect to MongoDB
 connectDB();
 
