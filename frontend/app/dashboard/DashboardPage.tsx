@@ -59,7 +59,6 @@ const DashboardPage = () => {
 
         {/* Group List Section */}
         <div className="bg-gray-900 rounded-2xl p-6 md:p-8 border border-gray-800 shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 border-b border-gray-800 pb-2">👥 Your Groups</h2>
           <GroupList token={token} />
         </div>
       </div>

@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link'; // ✅ Import Link
 import { fetchGroups } from '@/utils/api';
 
 interface User {
@@ -28,8 +29,6 @@ const GroupList: React.FC<GroupListProps> = ({ token }) => {
         console.log('Fetching groups with token:', token);
         const data = await fetchGroups(token);
         console.log('Fetched data:', data);
-
-        // 🔥 Adjust this based on real shape of response
         setGroups(data.groups || data || []);
       } catch (error) {
         console.error('Error fetching groups:', error);
@@ -55,7 +54,13 @@ const GroupList: React.FC<GroupListProps> = ({ token }) => {
               key={group._id}
               className="bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-700"
             >
-              <h3 className="text-xl font-semibold text-white mb-1">{group.groupName}</h3>
+              {/* 🔗 Clickable Group Name */}
+              <Link href={`/group/${group._id}`}>
+                <h3 className="text-xl font-semibold text-white mb-1 hover:underline cursor-pointer">
+                  {group.groupName}
+                </h3>
+              </Link>
+
               <p className="text-sm text-gray-400">
                 <span className="font-semibold">Created By:</span> {group.createdBy?.email || 'N/A'}
               </p>
