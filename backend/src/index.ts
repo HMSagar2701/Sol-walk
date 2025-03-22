@@ -22,13 +22,14 @@ app.set('trust proxy', 1); // Trust the first proxy (Render, Vercel, etc.)
 // ✅ Connect to MongoDB
 connectDB();
 
-// ✅ Middlewares
 app.use(
   cors({
     origin: process.env.FRONTEND_URL, 
-    credentials: true, // ✅ Allow cookies & headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 app.use(express.json());
 

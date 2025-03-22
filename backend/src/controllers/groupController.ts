@@ -67,10 +67,14 @@ export const acceptGroupInvite = async (req: AuthRequest, res: Response): Promis
   }
 };
 
-
-
 export const getGroupById = async (req: Request, res: Response): Promise<void> => {
   const { groupId } = req.params;
+
+  // ✅ Correct validation of ObjectId
+  if (!mongoose.Types.ObjectId.isValid(groupId)) {
+    res.status(400).json({ message: 'Invalid Group ID' });
+    return;
+  }
 
   try {
     const group = await Group.findById(groupId);
