@@ -24,12 +24,12 @@ connectDB();
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: 'https://sol-walk.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false 
   })
 );
-
 
 app.use(express.json());
 
