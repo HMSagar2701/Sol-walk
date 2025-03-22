@@ -23,12 +23,23 @@ app.set('trust proxy', 1); // Trust the first proxy (Render, Vercel, etc.)
 connectDB();
 
 // ✅ FIXED: CORS CONFIG
+const allowedOrigins = [
+  'https://sol-walk.vercel.app',
+  'http://localhost:3000',
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Fallback for local testing
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false, // You're not using cookies/session
+    credentials: false,
   })
 );
 
