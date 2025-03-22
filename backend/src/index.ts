@@ -25,10 +25,10 @@ connectDB();
 // ✅ FIXED: CORS CONFIG
 app.use(
   cors({
-    origin: 'https://sol-walk.vercel.app', // ✅ Hardcoded safe origin
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Fallback for local testing
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false, // ✅ No cookies/session used
+    credentials: false, // You're not using cookies/session
   })
 );
 

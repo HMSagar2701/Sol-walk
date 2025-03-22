@@ -88,3 +88,23 @@ export const getGroupById = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({ message: 'Error fetching group', error });
   }
 };
+
+export const getGroupsByUserDetails = async (req: AuthRequest, res: Response): Promise<void> => {
+  const userId = req.userId;
+
+  if (!userId) {
+    res.status(400).json({ message: 'Missing user ID' });
+    return;
+  }
+
+  try {
+    const groups = await Group.find({ members: userId })
+      .populate('createdBy', 'username email') // Optional: populate creator info
+      .populate('members', 'username email')   // Optional: populate member info
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(groups);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user groups', error });
+  }
+};
