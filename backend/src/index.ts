@@ -22,14 +22,18 @@ app.set('trust proxy', 1); // Trust the first proxy (Render, Vercel, etc.)
 // ✅ Connect to MongoDB
 connectDB();
 
+// ✅ FIXED: CORS CONFIG
 app.use(
   cors({
-    origin: 'https://sol-walk.vercel.app',
+    origin: 'https://sol-walk.vercel.app', // ✅ Hardcoded safe origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false 
+    credentials: false, // ✅ No cookies/session used
   })
 );
+
+// ✅ FIX: Preflight handler for OPTIONS
+app.options('*', cors());
 
 app.use(express.json());
 
