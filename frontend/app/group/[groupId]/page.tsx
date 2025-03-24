@@ -21,13 +21,12 @@ interface Group {
 }
 
 const GroupDetailPage: React.FC = () => {
-  const params = useParams();
+  const { groupId } = useParams() as { groupId: string };
   const router = useRouter();
-  const groupId = params?.groupId as string;
 
   const [group, setGroup] = useState<Group | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [accessDenied, setAccessDenied] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [accessDenied, setAccessDenied] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   const decodeJWT = (token: string): string | null => {
@@ -35,13 +34,51 @@ const GroupDetailPage: React.FC = () => {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload?.id ?? null;
     } catch (error) {
-      console.error('Failed to decode JWT', error);
+      console.error('Failed to decode JWT:', error);
       return null;
     }
   };
 
+  const fetchGroupDetails = async (token: string, currentUserId: string) => {
+    try {
+      const response = await axios.get<Group>(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/group/${groupId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const groupData = response.data;
+      const isMember = groupData.members.includes(currentUserId);
+      const isCreator = groupData.createdBy === currentUserId;
+
+      if (!isMember && !isCreator) {
+        setAccessDenied(true);
+        return;
+      }
+
+      setGroup(groupData);
+    } catch (error: any) {
+      console.error('Error fetching group:', error);
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 403) {
+          setAccessDenied(true);
+        } else {
+          alert(error.response?.data?.message || 'Failed to fetch group.');
+        }
+      } else {
+        alert('Unexpected error occurred.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchGroup = async () => {
+    const init = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please login first!');
@@ -51,65 +88,32 @@ const GroupDetailPage: React.FC = () => {
 
       const currentUserId = decodeJWT(token);
       if (!currentUserId) {
-        alert('Invalid token. Please log in again.');
+        alert('Invalid token. Please login again.');
         localStorage.removeItem('token');
         router.push('/login');
         return;
       }
 
       setUserId(currentUserId);
-
-      try {
-        const response = await axios.get<Group>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/group/${groupId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const groupData = response.data;
-        const isMember = groupData.members.includes(currentUserId);
-        const isCreator = groupData.createdBy === currentUserId;
-
-        if (!isMember && !isCreator) {
-          setAccessDenied(true);
-          return;
-        }
-
-        setGroup(groupData);
-      } catch (error: any) {
-        console.error('Error fetching group:', error);
-        if (axios.isAxiosError(error)) {
-          const status = error.response?.status;
-          if (status === 403) {
-            setAccessDenied(true);
-          } else {
-            alert(error.response?.data?.message || 'Failed to fetch group.');
-          }
-        } else {
-          alert('Unexpected error occurred.');
-        }
-      } finally {
-        setLoading(false);
-      }
+      await fetchGroupDetails(token, currentUserId);
     };
 
-    if (groupId) fetchGroup();
+    if (groupId) {
+      init();
+    }
   }, [groupId, router]);
+
+  const handleCreateChallenge = () => {
+    if (group) router.push(`/group/${group._id}/create-challenge`);
+  };
+
+  const handleInviteMember = () => {
+    if (group) router.push(`/group/${group._id}/invite`);
+  };
 
   if (loading) return <LoadingScreen />;
   if (accessDenied) return <AccessDenied />;
   if (!group) return <GroupNotFound />;
-
-  const handleCreateChallenge = () => {
-    router.push(`/group/${group._id}/create-challenge`);
-  };
-
-  const handleInviteMember = () => {
-    router.push(`/group/${group._id}/invite`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-950 text-white px-4 md:px-10 py-10">
@@ -140,7 +144,9 @@ const GroupDetailPage: React.FC = () => {
           groupName={group.groupName}
           createdBy={group.createdBy}
           createdAt={group.createdAt}
-          currentUserId={userId!} groupId={''}        />
+          currentUserId={userId!}
+          groupId={group._id}
+        />
         <GroupMembersList members={group.members} currentUserId={userId!} />
       </div>
     </div>
