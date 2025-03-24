@@ -9,7 +9,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'No token provided' });
+    res.status(401).json({ message: 'Token missing. Please log in again.' });
     return;
   }
 
@@ -19,7 +19,17 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
     req.userId = decoded.id;
     next();
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid or expired token' });
+  } catch (err: any) {
+    console.log("🔐 Incoming JWT token:", token);
+
+    if (err.name === 'TokenExpiredError') {
+      const decodedExpired = jwt.decode(token, { complete: true });
+      console.log("⏰ Token has expired.");
+      console.log("🧾 Decoded expired token payload:", decodedExpired);
+      res.status(401).json({ message: 'Token has expired. Please log in again.' });
+    } else {
+      console.log("❌ Invalid token error:", err.message);
+      res.status(401).json({ message: 'Invalid or expired token' });
+    }
   }
 };
