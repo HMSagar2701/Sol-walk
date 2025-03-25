@@ -2,14 +2,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { useRouter } from 'next/navigation';
 
 interface Challenge {
   _id: string;
-  potAmount: number;
-  groupId: string;
   challengeGoal: string;
   bidAmount: number;
   currency: string;
@@ -23,12 +21,12 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Next.js router for navigation
+  const [message, setMessage] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
 
   useEffect(() => {
     const fetchChallenges = async () => {
-      const token = localStorage.getItem('token'); // Get the token from localStorage
-
+      const token = localStorage.getItem('token');
       if (!token) {
         setError('Authentication required. Please log in.');
         setLoading(false);
@@ -39,21 +37,12 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/group-challenges/challenges/${groupId}`,
           {
-            headers: { Authorization: `Bearer ${token}` }, // Attach the token in the request headers
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
-
         setChallenges(response.data);
-      } catch (err: any) {
-        if (axios.isAxiosError(err) && err.response) {
-          if (err.response.status === 404) {
-            setError('No challenges found for this group.');
-          } else {
-            setError(`Error: ${err.response.data.message || 'Something went wrong.'}`);
-          }
-        } else {
-          setError('Failed to fetch challenges. Please check your connection.');
-        }
+      } catch (err) {
+        setError('Failed to fetch challenges. Please try again.'+err);
       } finally {
         setLoading(false);
       }
@@ -64,11 +53,44 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
     }
   }, [groupId]);
 
+  const joinChallenge = async (challengeId: string) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      setError('Authentication required. Please log in.');
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/group-challenges/join-group-challenge`,
+        { challengeId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMessage((prev) => ({ ...prev, [challengeId]: 'Joined' }));
+      setError(null);
+
+      // Update the UI to reflect the user has joined
+      setChallenges((prevChallenges) =>
+        prevChallenges.map((c) =>
+          c._id === challengeId
+            ? { ...c, participants: [...c.participants, { userId: 'currentUser' }] }
+            : c
+        )
+      );
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to join challenge.');
+    }
+  };
+
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-white">
       {/* Back to Dashboard Button */}
       <button
-        className="flex items-center text-gray-300 hover:text-white mb-4"
+        className="flex items-center text-white bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition mb-4"
         onClick={() => router.push('/dashboard')}
       >
         <ArrowLeftIcon className="w-5 h-5 mr-2" />
@@ -77,8 +99,8 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
 
       <h2 className="text-xl font-bold mb-4">Group Challenges</h2>
 
+      {error && <p className="text-red-500 mb-2">{error}</p>}
       {loading && <p>Loading challenges...</p>}
-      {error && <p className="text-red-500">{error}</p>}
 
       {!loading && !error && challenges.length === 0 && (
         <p className="text-gray-400">No challenges found for this group.</p>
@@ -95,6 +117,7 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
                 <th className="p-2 border border-gray-700">Start Date</th>
                 <th className="p-2 border border-gray-700">End Date</th>
                 <th className="p-2 border border-gray-700">Status</th>
+                <th className="p-2 border border-gray-700">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -111,6 +134,18 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
                   </td>
                   <td className="p-2 border border-gray-700 font-bold text-green-400">
                     {challenge.challengeStatus}
+                  </td>
+                  <td className="p-2 border border-gray-700">
+                    {message[challenge._id] ? (
+                      <span className="text-green-400 font-semibold">Joined</span>
+                    ) : (
+                      <button
+                        onClick={() => joinChallenge(challenge._id)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
+                      >
+                        Join
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
