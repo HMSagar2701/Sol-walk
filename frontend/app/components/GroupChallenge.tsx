@@ -13,15 +13,15 @@ interface Challenge {
   currency: string;
   startDate: string;
   endDate: string;
-  participants: any[];
+  participants: { userId: string }[];
   challengeStatus: string;
 }
 
-const GroupChallenges = ({ groupId }: { groupId: string }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const GroupChallenges = ({ groupId, userId }: { groupId: string; userId: string }) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ [key: string]: string }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
           }
         );
         setChallenges(response.data);
-      } catch (err) {
+      } catch (err: any) {
         setError('Failed to fetch challenges. Please try again.'+err);
       } finally {
         setLoading(false);
@@ -53,36 +53,11 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
     }
   }, [groupId]);
 
-  const joinChallenge = async (challengeId: string) => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      setError('Authentication required. Please log in.');
-      return;
-    }
-
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/group-challenges/join-group-challenge`,
-        { challengeId },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setMessage((prev) => ({ ...prev, [challengeId]: 'Joined' }));
-      setError(null);
-
-      // Update the UI to reflect the user has joined
-      setChallenges((prevChallenges) =>
-        prevChallenges.map((c) =>
-          c._id === challengeId
-            ? { ...c, participants: [...c.participants, { userId: 'currentUser' }] }
-            : c
-        )
-      );
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to join challenge.');
+  const handleJoinClick = () => {
+    if (groupId) {
+      router.push(`/group/${groupId}/stake`);
+    } else {
+      console.error("Group ID is missing!");
     }
   };
 
@@ -136,16 +111,12 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
                     {challenge.challengeStatus}
                   </td>
                   <td className="p-2 border border-gray-700">
-                    {message[challenge._id] ? (
-                      <span className="text-green-400 font-semibold">Joined</span>
-                    ) : (
-                      <button
-                        onClick={() => joinChallenge(challenge._id)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
-                      >
-                        Join
-                      </button>
-                    )}
+                    <button
+                      onClick={handleJoinClick}
+                      className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
+                    >
+                      Join
+                    </button>
                   </td>
                 </tr>
               ))}

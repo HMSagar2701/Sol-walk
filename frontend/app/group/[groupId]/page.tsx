@@ -30,7 +30,7 @@ const GroupPage = ({ params }: { params: { groupId: string } }) => {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-8">
       <h1 className="text-3xl font-bold mb-6">Group Challenges</h1>
-      <GroupChallenges groupId={params.groupId} />
+      <GroupChallenges groupId={params.groupId} userId={""} />
     </div>
   );
 };
@@ -253,7 +253,7 @@ const GroupDetailPage: React.FC = () => {
         <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
           🏆 Group Challenges:
         </h2>
-        <GroupChallenges groupId={group._id} />
+        <GroupChallenges groupId={group._id} userId={""} />
       </div>
     </div>
   );
