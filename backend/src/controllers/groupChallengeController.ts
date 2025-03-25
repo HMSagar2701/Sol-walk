@@ -126,3 +126,25 @@ export const getChallengeStatus = async (req: AuthRequest, res: Response): Promi
     res.status(500).json({ message: 'Error fetching challenge status', error });
   }
 };
+// GET /challenges/:groupId
+export const getChallengesByGroupId = async (req: AuthRequest, res: Response): Promise<void> => {
+  const { groupId } = req.params;
+
+  if (!groupId) {
+    res.status(400).json({ message: 'Missing groupId' });
+    return;
+  }
+
+  try {
+    const challenges = await GroupChallenge.find({ groupId: new Types.ObjectId(groupId) });
+
+    if (!challenges || challenges.length === 0) {
+      res.status(404).json({ message: 'No challenges found for this group' });
+      return;
+    }
+
+    res.status(200).json(challenges);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching challenges', error });
+  }
+};

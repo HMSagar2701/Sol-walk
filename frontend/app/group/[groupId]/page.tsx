@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
-import LoadingScreen from '@/app/components/Group/LoadingScreen';
-import AccessDenied from '@/app/components/Group/AccessDenied';
-import GroupNotFound from '@/app/components/Group/GroupNotFound';
-import { Plus, UserPlus } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
+import LoadingScreen from "@/app/components/Group/LoadingScreen";
+import AccessDenied from "@/app/components/Group/AccessDenied";
+import GroupNotFound from "@/app/components/Group/GroupNotFound";
+import { Plus, UserPlus } from "lucide-react";
+import GroupChallenges from "@/app/components/GroupChallenge";
 
 interface Group {
   _id: string;
@@ -24,6 +25,15 @@ interface User {
   email: string;
   picture?: string;
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const GroupPage = ({ params }: { params: { groupId: string } }) => {
+  return (
+    <div className="min-h-screen bg-gray-950 text-white p-8">
+      <h1 className="text-3xl font-bold mb-6">Group Challenges</h1>
+      <GroupChallenges groupId={params.groupId} />
+    </div>
+  );
+};
 
 const GroupDetailPage: React.FC = () => {
   const { groupId } = useParams() as { groupId: string };
@@ -37,10 +47,10 @@ const GroupDetailPage: React.FC = () => {
 
   const decodeJWT = (token: string): string | null => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       return payload?.id ?? null;
     } catch (error) {
-      console.error('Failed to decode JWT:', error);
+      console.error("Failed to decode JWT:", error);
       return null;
     }
   };
@@ -55,7 +65,7 @@ const GroupDetailPage: React.FC = () => {
       );
       setUser(response.data);
     } catch (error) {
-      console.error('Error fetching user details:', error);
+      console.error("Error fetching user details:", error);
     }
   };
 
@@ -80,16 +90,16 @@ const GroupDetailPage: React.FC = () => {
       setGroup(groupData);
       await fetchGroupMembers(groupData.members, token);
     } catch (error: any) {
-      console.error('Error fetching group:', error);
+      console.error("Error fetching group:", error);
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 403) {
           setAccessDenied(true);
         } else {
-          alert(error.response?.data?.message || 'Failed to fetch group.');
+          alert(error.response?.data?.message || "Failed to fetch group.");
         }
       } else {
-        alert('Unexpected error occurred.');
+        alert("Unexpected error occurred.");
       }
     } finally {
       setLoading(false);
@@ -107,24 +117,24 @@ const GroupDetailPage: React.FC = () => {
       );
       setMembers(response.data);
     } catch (error) {
-      console.error('Error fetching group members:', error);
+      console.error("Error fetching group members:", error);
     }
   };
 
   useEffect(() => {
     const init = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        alert('Please login first!');
-        router.push('/login');
+        alert("Please login first!");
+        router.push("/login");
         return;
       }
 
       const userId = decodeJWT(token);
       if (!userId) {
-        alert('Invalid token. Please login again.');
-        localStorage.removeItem('token');
-        router.push('/login');
+        alert("Invalid token. Please login again.");
+        localStorage.removeItem("token");
+        router.push("/login");
         return;
       }
 
@@ -148,7 +158,7 @@ const GroupDetailPage: React.FC = () => {
   if (loading) return <LoadingScreen />;
   if (accessDenied) return <AccessDenied />;
   if (!group) return <GroupNotFound />;
-
+  // Inside GroupDetailPage Component
   return (
     <div className="min-h-screen bg-gray-950 text-white px-4 md:px-12 py-12">
       {/* Header Section */}
@@ -159,37 +169,41 @@ const GroupDetailPage: React.FC = () => {
           </h1>
           {user && (
             <p className="text-gray-400 mt-2 text-lg">
-              Logged in as: <span className="text-white font-semibold">{user.name} ({user.email})</span>
+              Logged in as:{" "}
+              <span className="text-white font-semibold">
+                {user.name} ({user.email})
+              </span>
             </p>
           )}
         </div>
         <div className="flex flex-wrap gap-4">
-  <button
-    onClick={handleCreateChallenge}
-    className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
+          <button
+            onClick={handleCreateChallenge}
+            className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
                bg-gray-800 hover:bg-gray-700 transition-all duration-300 ease-in-out 
                rounded-full border border-gray-700 hover:opacity-90"
-  >
-    <Plus className="w-5 h-5 text-gray-300" />
-    Create Challenge
-  </button>
-  
-  <button
-    onClick={handleInviteMember}
-    className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
+          >
+            <Plus className="w-5 h-5 text-gray-300" />
+            Create Challenge
+          </button>
+
+          <button
+            onClick={handleInviteMember}
+            className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
                bg-blue-700 hover:bg-blue-600 transition-all duration-300 ease-in-out 
                rounded-full border border-blue-800 hover:opacity-90"
-  >
-    <UserPlus className="w-5 h-5 text-gray-300" />
-    Invite Member
-  </button>
-</div>
-
+          >
+            <UserPlus className="w-5 h-5 text-gray-300" />
+            Invite Member
+          </button>
+        </div>
       </div>
 
       {/* Member List */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">👤 Members:</h2>
+        <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
+          👤 Members:
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.length > 0 ? (
             members.map((member) => (
@@ -209,7 +223,9 @@ const GroupDetailPage: React.FC = () => {
                   </div>
                 )}
                 <div>
-                  <p className="text-lg font-medium text-white">{member.name}</p>
+                  <p className="text-lg font-medium text-white">
+                    {member.name}
+                  </p>
                   <p className="text-sm text-gray-400">{member.email}</p>
                 </div>
               </div>
@@ -218,6 +234,14 @@ const GroupDetailPage: React.FC = () => {
             <p className="text-gray-400">No members found.</p>
           )}
         </div>
+      </div>
+
+      {/* Group Challenges Section */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
+          🏆 Group Challenges:
+        </h2>
+        <GroupChallenges groupId={group._id} />
       </div>
     </div>
   );
