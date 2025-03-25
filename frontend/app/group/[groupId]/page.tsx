@@ -93,7 +93,7 @@ const GroupDetailPage: React.FC = () => {
       console.error("Error fetching group:", error);
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
-        if (status === 403) {
+        if (status === 403 || status === 404) {
           setAccessDenied(true);
         } else {
           alert(error.response?.data?.message || "Failed to fetch group.");
@@ -200,41 +200,53 @@ const GroupDetailPage: React.FC = () => {
       </div>
 
       {/* Member List */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
-          👤 Members:
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {members.length > 0 ? (
-            members.map((member) => (
-              <div
-                key={member._id}
-                className="flex items-center gap-4 bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-              >
-                {member.picture ? (
-                  <img
-                    src={member.picture}
-                    alt={member.name}
-                    className="w-12 h-12 rounded-full border-2 border-indigo-500"
-                  />
-                ) : (
-                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-700 text-white text-lg font-bold">
-                    {member.name.charAt(0)}
-                  </div>
-                )}
-                <div>
-                  <p className="text-lg font-medium text-white">
-                    {member.name}
-                  </p>
-                  <p className="text-sm text-gray-400">{member.email}</p>
-                </div>
+{/* Member List */}
+{/* Member List */}
+<div className="mt-8">
+  <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
+    👤 Members:
+  </h2>
+
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {members.length > 0 ? (
+      members.map((member) => {
+        console.log("Rendering Member:", member); // ✅ Debug individual member data
+
+        return (
+          <div
+            key={member._id}
+            className="flex items-center gap-4 bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            {/* Display Profile Picture */}
+            {member.picture ? (
+              <img
+                src={member.picture}
+                alt={member.name}
+                className="w-12 h-12 rounded-full border-2 border-indigo-500"
+                onError={(e) => (e.currentTarget.src = "/default-avatar.png")} // Fallback image
+              />
+            ) : (
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-700 text-white text-lg font-bold">
+                {member.name.charAt(0)}
               </div>
-            ))
-          ) : (
-            <p className="text-gray-400">No members found.</p>
-          )}
-        </div>
-      </div>
+            )}
+
+            {/* Member Info */}
+            <div>
+              <p className="text-lg font-medium text-white">{member.name}</p>
+              <p className="text-sm text-gray-400">{member.email}</p>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <p className="text-gray-400">No members found.</p>
+    )}
+  </div>
+</div>
+
+
 
       {/* Group Challenges Section */}
       <div className="mt-12">

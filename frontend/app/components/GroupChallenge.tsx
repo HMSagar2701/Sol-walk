@@ -2,6 +2,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 
 interface Challenge {
@@ -21,6 +23,7 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // Next.js router for navigation
 
   useEffect(() => {
     const fetchChallenges = async () => {
@@ -41,8 +44,16 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
         );
 
         setChallenges(response.data);
-      } catch (err) {
-        setError('Failed to fetch challenges. Please try again.'+err);
+      } catch (err: any) {
+        if (axios.isAxiosError(err) && err.response) {
+          if (err.response.status === 404) {
+            setError('No challenges found for this group.');
+          } else {
+            setError(`Error: ${err.response.data.message || 'Something went wrong.'}`);
+          }
+        } else {
+          setError('Failed to fetch challenges. Please check your connection.');
+        }
       } finally {
         setLoading(false);
       }
@@ -55,6 +66,15 @@ const GroupChallenges = ({ groupId }: { groupId: string }) => {
 
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-white">
+      {/* Back to Dashboard Button */}
+      <button
+        className="flex items-center text-gray-300 hover:text-white mb-4"
+        onClick={() => router.push('/dashboard')}
+      >
+        <ArrowLeftIcon className="w-5 h-5 mr-2" />
+        Back to Dashboard
+      </button>
+
       <h2 className="text-xl font-bold mb-4">Group Challenges</h2>
 
       {loading && <p>Loading challenges...</p>}
