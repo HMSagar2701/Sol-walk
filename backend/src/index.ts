@@ -13,6 +13,7 @@ import googleFitRoutes from './routes/googleFit';
 import fitbitRoutes from './routes/fitbitRoutes';
 import stakeRoutes from './routes/stakeRoutes';
 import solanaRoutes from "./routes/solanaRoutes";
+import userRoutes from "./routes/user"
 
 dotenv.config();
 const app = express();
@@ -66,6 +67,7 @@ app.use('/api/group', groupRoutes);
 app.get('/healthz', (_req: Request, res: Response) => {
   res.status(200).send('OK');
 });
+app.use('/api/user', userRoutes);  
 
 app.use('/api/health', healthRoutes);
 
