@@ -71,7 +71,7 @@ app.use('/api/user', userRoutes);
 
 app.use('/api/health', healthRoutes);
 
-app.use('/api/googlefit', googleFitRoutes);
+app.use('/api/google-fit', googleFitRoutes);
 
 app.use('/api/fitbit', fitbitRoutes);
 

@@ -153,4 +153,3 @@ export const groupDistributeRewards = async (req: Request, res: Response): Promi
     res.status(500).json({ success: false, message: 'Reward distribution failed', error: error.message || error });
   }
 };
-

@@ -7,8 +7,10 @@ import axios from "axios";
 import LoadingScreen from "@/app/components/Group/LoadingScreen";
 import AccessDenied from "@/app/components/Group/AccessDenied";
 import GroupNotFound from "@/app/components/Group/GroupNotFound";
-import { Plus, UserPlus } from "lucide-react";
 import GroupChallenges from "@/app/components/GroupChallenge";
+import GroupHeader from "@/app/components/GroupHeader";
+import GroupMembers from "@/app/components/GroupMembers";
+import GroupHealthTracking from "@/app/components/GroupHealthTracking";
 
 interface Group {
   _id: string;
@@ -25,15 +27,6 @@ interface User {
   email: string;
   picture?: string;
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GroupPage = ({ params }: { params: { groupId: string } }) => {
-  return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Group Challenges</h1>
-      <GroupChallenges groupId={params.groupId} userId={""} />
-    </div>
-  );
-};
 
 const GroupDetailPage: React.FC = () => {
   const { groupId } = useParams() as { groupId: string };
@@ -92,14 +85,9 @@ const GroupDetailPage: React.FC = () => {
     } catch (error: any) {
       console.error("Error fetching group:", error);
       if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        if (status === 403 || status === 404) {
+        if (error.response?.status === 403 || error.response?.status === 404) {
           setAccessDenied(true);
-        } else {
-          alert(error.response?.data?.message || "Failed to fetch group.");
         }
-      } else {
-        alert("Unexpected error occurred.");
       }
     } finally {
       setLoading(false);
@@ -125,14 +113,12 @@ const GroupDetailPage: React.FC = () => {
     const init = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please login first!");
         router.push("/login");
         return;
       }
 
       const userId = decodeJWT(token);
       if (!userId) {
-        alert("Invalid token. Please login again.");
         localStorage.removeItem("token");
         router.push("/login");
         return;
@@ -142,119 +128,34 @@ const GroupDetailPage: React.FC = () => {
       await fetchGroupDetails(token, userId);
     };
 
-    if (groupId) {
-      init();
-    }
+    if (groupId) init();
   }, [groupId, router]);
-
-  const handleCreateChallenge = () => {
-    if (group) router.push(`/group/${group._id}/create-challenge`);
-  };
-
-  const handleInviteMember = () => {
-    if (group) router.push(`/group/${group._id}/invite`);
-  };
 
   if (loading) return <LoadingScreen />;
   if (accessDenied) return <AccessDenied />;
   if (!group) return <GroupNotFound />;
-  // Inside GroupDetailPage Component
+
   return (
     <div className="min-h-screen bg-gray-950 text-white px-4 md:px-12 py-12">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Group - 👥 {group.groupName}
-          </h1>
-          {user && (
-            <p className="text-gray-400 mt-2 text-lg">
-              Logged in as:{" "}
-              <span className="text-white font-semibold">
-                {user.name} ({user.email})
-              </span>
-            </p>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <button
-            onClick={handleCreateChallenge}
-            className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
-               bg-gray-800 hover:bg-gray-700 transition-all duration-300 ease-in-out 
-               rounded-full border border-gray-700 hover:opacity-90"
-          >
-            <Plus className="w-5 h-5 text-gray-300" />
-            Create Challenge
-          </button>
+      <GroupHeader
+        groupName={group.groupName}
+        user={user}
+        handleCreateChallenge={() => router.push(`/group/${group._id}/create-challenge`)}
+        handleInviteMember={() => router.push(`/group/${group._id}/invite`)}
+      />
 
-          <button
-            onClick={handleInviteMember}
-            className="flex items-center gap-2 px-8 py-3 text-lg font-medium text-white 
-               bg-blue-700 hover:bg-blue-600 transition-all duration-300 ease-in-out 
-               rounded-full border border-blue-800 hover:opacity-90"
-          >
-            <UserPlus className="w-5 h-5 text-gray-300" />
-            Invite Member
-          </button>
-        </div>
-      </div>
+      {/* 👥 Group Members Section */}
+      <GroupMembers members={members} />
 
-      {/* Member List */}
-{/* Member List */}
-{/* Member List */}
-<div className="mt-8">
-  <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
-    👤 Members:
-  </h2>
+      {/* 🏆 Group Challenges Section */}
+      <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4 mt-10">
+  🏆 Group Challenges:
+      </h2>
+      <GroupChallenges groupId={group._id} userId={user?._id || ""} />
+      <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4 mt-3"> </h2>
 
-
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {members.length > 0 ? (
-      members.map((member) => {
-        console.log("Rendering Member:", member); // ✅ Debug individual member data
-
-        return (
-          <div
-            key={member._id}
-            className="flex items-center gap-4 bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            {/* Display Profile Picture */}
-            {member.picture ? (
-              <img
-                src={member.picture}
-                alt={member.name}
-                className="w-12 h-12 rounded-full border-2 border-indigo-500"
-                onError={(e) => (e.currentTarget.src = "/default-avatar.png")} // Fallback image
-              />
-            ) : (
-              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-700 text-white text-lg font-bold">
-                {member.name.charAt(0)}
-              </div>
-            )}
-
-            {/* Member Info */}
-            <div>
-              <p className="text-lg font-medium text-white">{member.name}</p>
-              <p className="text-sm text-gray-400">{member.email}</p>
-            </div>
-          </div>
-        );
-      })
-    ) : (
-      <p className="text-gray-400">No members found.</p>
-    )}
-  </div>
-</div>
-
-
-
-      {/* Group Challenges Section */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold border-b pb-2 border-gray-700 mb-4">
-          🏆 Group Challenges:
-        </h2>
-        <GroupChallenges groupId={group._id} userId={""} />
-      </div>
+      {/* New Health Tracking Section */}
+      <GroupHealthTracking userId={user?._id || ""} />
     </div>
   );
 };

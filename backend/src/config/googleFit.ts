@@ -8,5 +8,7 @@ export const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:8080';
 export const REDIRECT_URI = `${CLIENT_URL}/api/google-fit/callback`;
 
 export const SCOPES = [
-  'https://www.googleapis.com/auth/fitness.activity.read',
+    'https://www.googleapis.com/auth/fitness.activity.read',
+    'https://www.googleapis.com/auth/fitness.activity.write',
+    'https://www.googleapis.com/auth/fitness.body.read'
 ];
